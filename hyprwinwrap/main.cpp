@@ -15,6 +15,7 @@
 #include <hyprland/src/managers/LayoutManager.hpp>
 #include <hyprland/src/managers/input/InputManager.hpp>
 #include <hyprland/src/helpers/time/Time.hpp>
+#include <unordered_map>
 #undef private
 
 #include "globals.hpp"
@@ -23,6 +24,10 @@
 APICALL EXPORT std::string PLUGIN_API_VERSION() {
     return HYPRLAND_API_VERSION;
 }
+
+static std::unordered_map<PHLWINDOW, bool> interactableStates;
+std::vector<PHLWINDOWREF> bgWindows;
+
 
 // hooks
 inline CFunctionHook* subsurfaceHook = nullptr;
@@ -101,17 +106,21 @@ void                      onNewWindow(PHLWINDOW pWindow) {
     pWindow->sendWindowSize(true);
 
     bgWindows.push_back(pWindow);
+    interactableStates[pWindow] = false; // starts non-interactable
     pWindow->m_hidden = true;
 
     g_pInputManager->refocus();
     Log::logger->log(Log::DEBUG, "[hyprwinwrap] new window moved to bg {}", pWindow);
+
 }
 
 void onCloseWindow(PHLWINDOW pWindow) {
     std::erase_if(bgWindows, [pWindow](const auto& ref) { return ref.expired() || ref.lock() == pWindow; });
+    interactableStates.erase(pWindow);
 
     Log::logger->log(Log::DEBUG, "[hyprwinwrap] closed window {}", pWindow);
 }
+
 
 void onRenderStage(eRenderStage stage) {
     if (stage != RENDER_PRE_WINDOWS)
@@ -128,7 +137,9 @@ void onRenderStage(eRenderStage stage) {
 
         g_pHyprRenderer->renderWindow(bgw, g_pHyprOpenGL->m_renderData.pMonitor.lock(), Time::steadyNow(), false, RENDER_PASS_ALL, false, true);
 
-        bgw->m_hidden = true;
+        const bool interactable = interactableStates.contains(bgw) ? interactableStates[bgw] : false;
+        bgw->m_hidden = !interactable;
+
     }
 }
 
@@ -147,7 +158,9 @@ void onCommitSubsurface(Desktop::View::CSubsurface* thisptr) {
     if (const auto MON = PWINDOW->m_monitor.lock(); MON)
         g_pHyprOpenGL->markBlurDirtyForMonitor(MON);
 
-    PWINDOW->m_hidden = true;
+    const bool interactable = interactableStates.contains(PWINDOW) ? interactableStates[PWINDOW] : false;
+    PWINDOW->m_hidden = !interactable;
+
 }
 
 void onCommit(void* owner, void* data) {
@@ -184,6 +197,35 @@ void onConfigReloaded() {
     }
 }
 
+void dispatchToggleInteractivity(std::string) {
+    if (bgWindows.empty()) {
+        HyprlandAPI::addNotification(PHANDLE, "[hyprwinwrap] No background windows to toggle",
+                                     CHyprColor{1.0, 1.0, 0.2, 1.0}, 2500);
+        return;
+    }
+
+    int toggled = 0;
+
+    for (auto& bg : bgWindows) {
+        const auto bgw = bg.lock();
+        if (!bgw)
+            continue;
+
+        auto it = interactableStates.find(bgw);
+        if (it == interactableStates.end())
+            continue;
+
+        it->second = !it->second;
+        bgw->m_hidden = !it->second;
+        toggled++;
+    }
+
+    HyprlandAPI::addNotification(PHANDLE,
+                                 std::string{"[hyprwinwrap] toggled "} + std::to_string(toggled) + " window(s)",
+                                 CHyprColor{0.2, 0.8, 1.0, 1.0}, 2500);
+}
+
+
 APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     PHANDLE = handle;
 
@@ -202,6 +244,8 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle) {
     static auto P3 = HyprlandAPI::registerCallbackDynamic(PHANDLE, "render", [&](void* self, SCallbackInfo& info, std::any data) { onRenderStage(std::any_cast<eRenderStage>(data)); });
     static auto P4 = HyprlandAPI::registerCallbackDynamic(PHANDLE, "configReloaded", [&](void* self, SCallbackInfo& info, std::any data) { onConfigReloaded(); });
     // clang-format on
+
+    HyprlandAPI::addDispatcher(PHANDLE, "hyprwinwrap_toggle", dispatchToggleInteractivity);
 
     auto fns = HyprlandAPI::findFunctionsByName(PHANDLE, "_ZN7Desktop4View11CSubsurface8onCommitEv");
     if (fns.size() < 1)
