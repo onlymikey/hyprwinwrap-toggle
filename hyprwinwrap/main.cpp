@@ -165,20 +165,27 @@ void onCommitSubsurface(Desktop::View::CSubsurface* thisptr) {
 void onCommit(void* owner, void* data) {
     const auto PWINDOW = ((Desktop::View::CWindow*)owner)->m_self.lock();
 
-    if (std::find_if(bgWindows.begin(), bgWindows.end(), [PWINDOW](const auto& ref) { return ref.lock() == PWINDOW; }) == bgWindows.end()) {
+    if (std::find_if(bgWindows.begin(), bgWindows.end(),
+                     [PWINDOW](const auto& ref) { return ref.lock() == PWINDOW; }) == bgWindows.end()) {
         ((origCommit)commitHook->m_original)(owner, data);
         return;
     }
 
-    // cant use setHidden cuz that sends suspended and shit too that would be laggy
+    // force visible to render/update
     PWINDOW->m_hidden = false;
 
     ((origCommit)commitHook->m_original)(owner, data);
+
     if (const auto MON = PWINDOW->m_monitor.lock(); MON)
         g_pHyprOpenGL->markBlurDirtyForMonitor(MON);
 
-    PWINDOW->m_hidden = true;
+    const bool interactable =
+        interactableStates.contains(PWINDOW) ? interactableStates[PWINDOW] : false;
+
+    // IMPORTANT: do NOT always hide here; respect interactivity
+    PWINDOW->m_hidden = !interactable;
 }
+
 
 void onConfigReloaded() {
     static auto* const PCLASS = (Hyprlang::STRING const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hyprwinwrap:class")->getDataStaticPtr();
