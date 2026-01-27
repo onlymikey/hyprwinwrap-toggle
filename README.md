@@ -1,112 +1,82 @@
-# hyprland-plugins
+# hyprwinwrap-toggle
 
-This repo houses official plugins for Hyprland.
+A maintained fork of **hyprwinwrap** for Hyprland that lets you run a Wayland app as an animated wallpaper **and toggle its interactivity** on demand.
 
-# Plugin list
- - borders-plus-plus -> adds one or two additional borders to windows
- - csgo-vulkan-fix -> fixes custom resolutions on CS:GO with `-vulkan`
- - hyprbars -> adds title bars to windows
- - hyprexpo -> adds an expo-like workspace overview
- - hyprfocus -> flashfocus for hyprland
- - hyprscrolling -> adds a scrolling layout to hyprland
- - hyprtrails -> adds smooth trails behind moving windows
- - hyprwinwrap -> clone of xwinwrap, allows you to put any app as a wallpaper
- - xtra-dispatchers -> adds some new dispatchers
+**Dispatch:**
+```bash
+hyprctl dispatch hyprwinwrap_toggle
+```
 
-# Install
-> [!IMPORTANT]
-> hyprland-plugins only officially supports installation via `hyprpm`.
-> `hyprpm` automatically detects your hyprland version & installs only
-> the corresponding "pinned" release of hyprland-plugins.
-> If you want the latest commits to hyprland-plugins, you need to use
-> `hyprland-git`.
+> Use-case: a “lofi wallpaper app” that is usually non-interactive, but can be toggled to accept input when you want.
 
-## Install with `hyprpm`
+---
 
-To install these plugins, from the command line run:
+## Features
+
+* Run a windowed Wayland app as a wallpaper-like background surface
+* Toggle input/interactivity at runtime with a Hyprland dispatch
+* Focused on staying usable with recent Hyprland versions
+
+---
+
+## Install
+
+### Install with `hyprpm`
+
+1. Update plugin headers:
+
 ```bash
 hyprpm update
 ```
-Then add this repository:
+
+2. Add this repository:
+
 ```bash
-hyprpm add https://github.com/hyprwm/hyprland-plugins
+hyprpm add https://github.com/onlymikey/hyprwinwrap-toggle
 ```
-then enable the desired plugin with
+
+3. Enable the plugin:
+
 ```bash
-hyprpm enable <plugin-name>
+hyprpm enable hyprwinwrap-toggle
 ```
 
-See the respective README's in the subdirectories for configuration options.
+See the Hyprland plugins wiki and `hyprpm -h` for more details:
 
-See [the plugins wiki](https://wiki.hyprland.org/Plugins/Using-Plugins/#installing--using-plugins) and `hyprpm -h` for more details.
+* [https://wiki.hyprland.org/Plugins/Using-Plugins/#installing--using-plugins](https://wiki.hyprland.org/Plugins/Using-Plugins/#installing--using-plugins)
 
-## Install on Nix
+---
 
-To use these plugins, it's recommended that you are already using the
-[Hyprland flake](https://github.com/hyprwm/Hyprland).
-First, add this flake to your inputs:
+## Configuration
 
-```nix
-inputs = {
-  # ...
-  hyprland.url = "github:hyprwm/Hyprland";
-  hyprland-plugins = {
-    url = "github:hyprwm/hyprland-plugins";
-    inputs.hyprland.follows = "hyprland";
-  };
+See the upstream-style configuration options here:
 
-  # ...
-};
+* `hyprwinwrap/README.md`
+
+### Toggle interactivity
+
+```bash
+hyprctl dispatch hyprwinwrap_toggle
 ```
 
-The `inputs.hyprland.follows` guarantees the plugins will always be built using
-your locked Hyprland version, thus you will never get version mismatches that
-lead to errors.
+---
 
-After that's done, you can use the plugins with the Home Manager module like
-this:
+## Nix
 
-```nix
-{inputs, pkgs, ...}: {
-  wayland.windowManager.hyprland = {
-    enable = true;
-    # ...
-    plugins = [
-      inputs.hyprland-plugins.packages.${pkgs.system}.hyprbars
-      # ...
-    ];
-  };
-}
-```
+Nix support is not currently documented. Contributions are welcome.
 
-If you don't use Home Manager:
+---
 
-```nix
-{ lib, pkgs, inputs, ... }:
-with lib; let
-  hyprPluginPkgs = inputs.hyprland-plugins.packages.${pkgs.system};
-  hypr-plugin-dir = pkgs.symlinkJoin {
-    name = "hyrpland-plugins";
-    paths = with hyprPluginPkgs; [
-      hyprexpo
-      #...plugins
-    ];
-  };
-in
-{
-  environment.sessionVariables = { HYPR_PLUGIN_DIR = hypr-plugin-dir; };
-}
-```
+## Notes / Troubleshooting
 
-And in `hyprland.conf`
+* If tiled windows don’t render the wallpaper app correctly, try disabling Hyprland’s blur “new optimizations”:
 
-```hyprlang
-# load all the plugins you installed
-exec-once = hyprctl plugin load "$HYPR_PLUGIN_DIR/lib/libhyprexpo.so"
-```
+  * Set `new_optimizations = false` in the blur section of `hyprland.conf`.
+* If you use Waybar and it gets covered by the wallpaper app, set the wallpaper window layer to `top`.
 
-# Contributing
+---
 
-Feel free to open issues and MRs with fixes.
+## Credits
 
-If you want your plugin added here, contact vaxry beforehand.
+* Original project: **hyprwinwrap** (upstream authors and contributors)
+* This fork focuses on maintenance and runtime interactivity toggling.
