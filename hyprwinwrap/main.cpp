@@ -26,7 +26,6 @@ APICALL EXPORT std::string PLUGIN_API_VERSION() {
 }
 
 static std::unordered_map<PHLWINDOW, bool> interactableStates;
-std::vector<PHLWINDOWREF> bgWindows;
 
 
 // hooks
