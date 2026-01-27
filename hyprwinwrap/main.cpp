@@ -17,6 +17,7 @@
 #include <unordered_map>
 #include <hyprland/src/layout/LayoutManager.hpp>
 #include <hyprland/src/event/EventBus.hpp>
+#include <unordered_map>
 #undef private
 
 #include "globals.hpp"
@@ -27,6 +28,7 @@ APICALL EXPORT std::string PLUGIN_API_VERSION() {
 }
 
 static std::unordered_map<PHLWINDOW, bool> interactableStates;
+std::vector<PHLWINDOWREF> bgWindows;
 
 
 // hooks
