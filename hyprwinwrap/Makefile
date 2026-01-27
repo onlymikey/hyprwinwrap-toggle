@@ -1,4 +1,4 @@
-# Else exist specifically for clang
+# Else exists specifically for clang
 ifeq ($(CXX),g++)
     EXTRA_FLAGS = --no-gnu-unique
 else
@@ -8,7 +8,11 @@ endif
 CXXFLAGS ?= -O2
 CXXFLAGS += -shared -fPIC -std=c++2b
 
+TARGET = hyprwinwrap.so
+
 all:
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(EXTRA_FLAGS) main.cpp -o hyprwinwrap.so `pkg-config --cflags pixman-1 libdrm hyprland pangocairo libinput libudev wayland-server xkbcommon`
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(EXTRA_FLAGS) main.cpp -o $(TARGET) \
+	`pkg-config --cflags --libs pixman-1 libdrm hyprland pangocairo libinput libudev wayland-server xkbcommon`
+
 clean:
-	rm ./hyprwinwrap.so
+	rm -f ./$(TARGET)
