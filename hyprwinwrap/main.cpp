@@ -14,7 +14,6 @@
 #include <hyprland/src/render/Renderer.hpp>
 #include <hyprland/src/managers/input/InputManager.hpp>
 #include <hyprland/src/helpers/time/Time.hpp>
-#include <unordered_map>
 #include <hyprland/src/layout/LayoutManager.hpp>
 #include <hyprland/src/event/EventBus.hpp>
 #include <unordered_map>
@@ -28,7 +27,6 @@ APICALL EXPORT std::string PLUGIN_API_VERSION() {
 }
 
 static std::unordered_map<PHLWINDOW, bool> interactableStates;
-std::vector<PHLWINDOWREF> bgWindows;
 
 
 // hooks

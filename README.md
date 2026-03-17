@@ -1,3 +1,4 @@
+
 # hyprwinwrap-toggle
 
 A **maintained fork of `hyprwinwrap`** for Hyprland that lets you run a Wayland app as an animated wallpaper **and toggle its interactivity at runtime**.
