@@ -1,13 +1,13 @@
 # hyprwinwrap-toggle (Archived)
 
-«[!IMPORTANT]
+[!IMPORTANT]
 This repository is archived.
 
 The original "hyprwinwrap" project is actively maintained at:
 
 https://github.com/gen3vra/hyprwinwrap
 
-If you're looking for a working and supported version, please use that repository instead.»
+If you're looking for a working and supported version, please use that repository instead.
 
 ---
 
