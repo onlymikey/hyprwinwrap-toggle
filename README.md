@@ -1,131 +1,63 @@
-# hyprwinwrap-toggle
+# hyprwinwrap-toggle (Archived)
 
-A **development fork of `hyprwinwrap-toggle`** for Hyprland that lets you run a Wayland app as an animated wallpaper **and toggle its interactivity at runtime**.
+«[!IMPORTANT]
+This repository is archived.
 
-Designed for setups like **idle / ambient wallpaper apps** that should normally behave like a background, but can temporarily receive input when needed.
+The original "hyprwinwrap" project is actively maintained at:
 
-Please submit changes upstream at [onlymikey's repo](https://github.com/onlymikey/hyprwinwrap-toggle)
+https://github.com/gen3vra/hyprwinwrap
 
----
-
-## Features
-
-- Run a windowed Wayland app as a wallpaper-like background surface
-- Toggle input / interactivity at runtime via a Hyprland dispatcher
-- Compatible with recent Hyprland releases
-- Drag & drop, mouse and keyboard input supported when interactable
+If you're looking for a working and supported version, please use that repository instead.»
 
 ---
 
-## Install
+### Why is this repository archived?
 
-### Using `hyprpm`
+This repository started as a compatibility fork of "hyprwinwrap-toggle" after the original project appeared to be unmaintained and incompatible with newer Hyprland releases.
 
-1. Update plugin headers:
+The goal was simple:
 
-```bash
-hyprpm update
-```
+- Keep the plugin usable on newer Hyprland versions
+- Add runtime interactivity toggling
+- Provide a temporary solution until an actively maintained upstream existed
 
-2. Add this repository:
+Afterward, it was discovered that the original project had actually been moved and is now actively maintained by another developer at:
 
-```bash
-hyprpm add https://github.com/onlymikey/hyprwinwrap-toggle
-```
+https://github.com/gen3vra/hyprwinwrap
 
-3. Enable the plugin:
+Since an upstream project now exists and is being maintained, keeping this fork alive would only create confusion and fragment development efforts.
 
-```bash
-hyprpm enable hyprwinwrap-toggle
-```
-
-For more details, see:
-
-- [https://wiki.hyprland.org/Plugins/Using-Plugins/#installing--using-plugins](https://wiki.hyprland.org/Plugins/Using-Plugins/#installing--using-plugins)
-- `hyprpm -h`
+For that reason, this repository has been archived.
 
 ---
 
-## Dispatch
+### What should I use instead?
 
-```bash
-hyprctl dispatch hyprwinwrap_toggle
-```
+Use the actively maintained upstream project:
 
-This toggles input handling for all managed background windows.
+https://github.com/gen3vra/hyprwinwrap
 
----
+It includes:
 
-## Configuration
-
-Configuration follows the **original `hyprwinwrap` semantics**.
-
-See upstream-style options here:
-
-```
-hyprwinwrap/README.md
-```
-
-Typical usage is matching a window by `class` or `title` and letting the plugin manage it as a background surface.
+- Support for recent Hyprland releases
+- Ongoing maintenance
+- Updated configuration methods
+- Future compatibility fixes
 
 ---
 
-## Toggling interactivity
+This repository served as a temporary compatibility fork and proof-of-concept for runtime interactivity toggling.
 
-Example keybind:
-
-```ini
-bind = SUPER, L, exec, hyprctl dispatch hyprwinwrap_toggle
-```
-
-When disabled, the window behaves like a wallpaper.
-When enabled, the window accepts mouse and keyboard input normally.
+While it is no longer maintained, the code remains available for reference and archival purposes.
 
 ---
 
-## Nix
+### Credits
 
-Nix support is **not documented yet**.
-
-If you are a Nix user and want to contribute:
-
-- PRs are welcome
-- Keep the scope focused (build + install only)
+- Original hyprwinwrap authors
+- gen3vra for continuing active development
+- Everyone who tested, reported issues, and helped keep the plugin alive
 
 ---
 
-## Notes / Troubleshooting
-
-- If tiled windows fail to render the wallpaper correctly:
-  - Disable Hyprland blur “new optimizations”:
-
-    ```ini
-    decoration {
-      blur {
-        new_optimizations = false
-      }
-    }
-    ```
-
-- If Waybar or other layer-shell surfaces are covered:
-  - Ensure the wallpaper window uses `layer = top`
-  - Or hide Waybar on the monitor where the wallpaper app runs
-
----
-
-## Scope & Support
-
-This fork **intentionally limits its scope**:
-
-- ✔ Input behavior and interactivity toggling
-- ✔ Compatibility with newer Hyprland versions
-- ✖ Rendering internals
-- ✖ Visual effects or performance tuning
-
-Issues related to **rendering behavior** should be reported upstream.
-
----
-
-## Credits
-
-- **hyprwinwrap** — original project and core logic
+Change da world, my final message, goodbye. 🚬🐀
