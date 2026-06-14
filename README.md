@@ -1,6 +1,6 @@
 # hyprwinwrap-toggle (Archived)
 
-[!IMPORTANT]
+# ⚠️ ARCHIVED REPOSITORY
 This repository is archived.
 
 The original "hyprwinwrap" project is actively maintained at:
